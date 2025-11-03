@@ -4,7 +4,7 @@
 void stampa(int *a, int length);
 
 int main() {
-    int n, Max_Char = 30;
+    int n;
     printf("quanti valori vuoi inserire? ");
     scanf("%d",&n);
     
