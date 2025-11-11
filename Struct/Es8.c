@@ -96,7 +96,7 @@
                     float somma = 0;
                     int distribuzione[4] = {0,0,0,0};
                     for (int i = 0; i < counterStudenti; i++){
-                        int media = mediaEsami(dbStudenti[i].esami, dbStudenti[i].numeroEsami);
+                        float media = mediaEsami(dbStudenti[i].esami, dbStudenti[i].numeroEsami);
                         somma += media;
                         if (media <= 21) distribuzione[0]++;
                         else if (media <= 25) distribuzione[1]++;
