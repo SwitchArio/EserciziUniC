@@ -103,7 +103,7 @@
                         else if (media <= 28) distribuzione[2]++;
                         else distribuzione[3]++;
                     }
-                    printf("Media generale: %.2f\n", somma/counterStudenti);
+                    printf("Media generale: %.2f\n", somma/(float)counterStudenti);
                     printf("Distribuzione voti:\n   %d nel range 18-21\n   %d nel range 22-25\n   %d nel range 26-28\n   %d nel range 29-30L\n", 
                     distribuzione[0], distribuzione[1], distribuzione[2], distribuzione[3]);
                 } break;
