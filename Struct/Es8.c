@@ -16,6 +16,8 @@
         Esame *esami;
     } Studente;
 
+    void genera_statistiche();
+    void stampaEsamiStudenteOrdinati(Studente *studente);
     int inizializzaEsame(Esame *s);
     void stampaEsame(Esame e);
     void scambiaEsami(Esame *esami, int from, int to);
@@ -77,38 +79,14 @@
                     printf("Lo studente con la media migliore è %s %s", studente->nome, studente->cognome);
                 } break;
                 case 5: {
-                    Studente *studente = ricercaStudente();
                     
-                    int curr = 0;
-                    int nEsami = studente->numeroEsami;
-                    Esame *esami = studente->esami;
-                    while (curr < nEsami)
-                    {
-                        int k = indiceMigliorVotoDaA(esami, nEsami, curr, nEsami);
-                        if (k == -1) { printf("Errore nella ricerca"); break; }
-                        stampaEsame(esami[k]);
-                        scambiaEsami(esami, k, curr++);
-                    }
+                    Studente *studente = ricercaStudente();
+                    if (studente == NULL) break;
+                    stampaEsamiStudenteOrdinati(studente);
+                    
                 } break;
-                case 6: {
-                    printf("Statistiche: \n");
-                    printf("Numero totale di esami nel sistema: %d\n", esamiInseriti);
-                    float somma = 0;
-                    int distribuzione[4] = {0,0,0,0};
-                    for (int i = 0; i < counterStudenti; i++){
-                        float media = mediaEsami(dbStudenti[i].esami, dbStudenti[i].numeroEsami);
-                        somma += media;
-                        if (media <= 21) distribuzione[0]++;
-                        else if (media <= 25) distribuzione[1]++;
-                        else if (media <= 28) distribuzione[2]++;
-                        else distribuzione[3]++;
-                    }
-                    printf("Media generale: %.2f\n", somma/(float)counterStudenti);
-                    printf("Distribuzione voti:\n   %d nel range 18-21\n   %d nel range 22-25\n   %d nel range 26-28\n   %d nel range 29-30L\n", 
-                    distribuzione[0], distribuzione[1], distribuzione[2], distribuzione[3]);
-                } break;
-                default:
-                    break;
+                case 6: genera_statistiche(); break;
+                default: break;
             }
             scelta = menuScelta();
         }
@@ -118,6 +96,39 @@
         free(dbStudenti);
         
         return 0;
+    }
+
+    void stampaEsamiStudenteOrdinati(Studente *studente) {
+        int curr = 0;
+        int nEsami = studente->numeroEsami;
+        Esame *esami = studente->esami;
+        while (curr < nEsami)
+        {
+            int k = indiceMigliorVotoDaA(esami, nEsami, curr, nEsami);
+            if (k == -1) { printf("Errore nella ricerca"); break; }
+            stampaEsame(esami[k]);
+            scambiaEsami(esami, k, curr++);
+        }
+        return;
+    }
+
+    void genera_statistiche(){
+        printf("Statistiche: \n");
+        printf("Numero totale di esami nel sistema: %d\n", esamiInseriti);
+        float somma = 0;
+        int distribuzione[4] = {0,0,0,0};
+        for (int i = 0; i < counterStudenti; i++){
+            float media = mediaEsami(dbStudenti[i].esami, dbStudenti[i].numeroEsami);
+            somma += media;
+            if (media <= 21) distribuzione[0]++;
+            else if (media <= 25) distribuzione[1]++;
+            else if (media <= 28) distribuzione[2]++;
+            else distribuzione[3]++;
+        }
+        printf("Media generale: %.2f\n", somma/(float)counterStudenti);
+        printf("Distribuzione voti:\n   %d nel range 18-21\n   %d nel range 22-25\n   %d nel range 26-28\n   %d nel range 29-30L\n", 
+        distribuzione[0], distribuzione[1], distribuzione[2], distribuzione[3]);
+        return;
     }
 
     void aggiungiEsameInArray(Esame toSearch, Esame **list, int *listLen){
