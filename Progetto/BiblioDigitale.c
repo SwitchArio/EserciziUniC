@@ -45,7 +45,7 @@ Prestito *dbPrestiti = NULL;
 int maxLibri = 0, maxUtenti = 0, maxPrestiti = 0;
 int countLibri = 0, countUtenti = 0, countPrestiti = 0;
 
-int dbCaricato = 0;
+int dbCaricato = 0, dbSalvato = 1;
 
 // =========================================================
 // PROTOTIPI
@@ -58,6 +58,8 @@ void mostraMenu();
 void inserisciLibro();
 void stampaLibro(Libro l);
 void visualizzaLibri();
+void cercaLibriPerAutore();
+void cercaLibriDisponibili();
 int cercaLibroISBN(char *isbn);
 
 // Gestione Utenti
@@ -70,13 +72,17 @@ int cercaUtenteDaCodice(int codice);
 void creaPrestito();
 void restituisciLibro();
 void visualizzaPrestitiAttivi();
+void stampaPrestito(Prestito l);
+void prestitiPerUtente();
 void generaDataRestituzione(char *data, char *dataRestituzione);
+void prestitiPerUtente();
 
 // File Binario
 void salvaDB();
 void caricaDB();
 
 // Utils
+void generaStatistiche();
 int initDB();
 int validaData(char *data);
 int validaEmail(char *mail);
@@ -114,6 +120,9 @@ int main() {
                 else printf("Libro non trovato.\n");
             } break;
 
+            case 4: cercaLibriPerAutore(); break;
+            case 5: cercaLibriDisponibili(); break;
+
             case 6: inserisciUtente(); break;
             case 7: visualizzaUtenti(); break;
             case 8: {
@@ -128,9 +137,17 @@ int main() {
             case 9: creaPrestito(); break;
             case 10: restituisciLibro(); break;
             case 11: visualizzaPrestitiAttivi(); break;
+            case 12: prestitiPerUtente(); break;
+            case 13: generaStatistiche(); break;
 
             case 16: salvaDB(); break;
             case 17: caricaDB(); break;
+            case 20: if (!dbSalvato) {
+                printf("Non hai salvato le tue modifiche, vuoi salvarle? (y/n) ");
+                char answer;
+                scanf(" %c", &answer);  // lo spazio elimina whitespace precedenti
+                if(answer == 'y') salvaDB();
+            }
         }
 
         
@@ -138,12 +155,9 @@ int main() {
     } while (scelta != 20);
 
     // deallocazione
-    for (int i = 0; i < countLibri; i++) free(dbLibri+i);
-    for (int i = 0; i < countUtenti; i++) free(dbUtenti+i);
-    for (int i = 0; i < countPrestiti; i++) free(dbPrestiti+i);
-    //free(dbLibri);
-    //free(dbUtenti);
-    //free(dbPrestiti);
+    free(dbLibri);
+    free(dbUtenti);
+    free(dbPrestiti);
 
     return 0;
 }
@@ -154,13 +168,13 @@ int main() {
 // =========================================================
 
 int initDB() {
-    printf("Capacita' massima libri: ");
+    printf("Capacità massima libri: ");
     scanf("%d", &maxLibri);
 
-    printf("Capacita' massima utenti: ");
+    printf("Capacità massima utenti: ");
     scanf("%d", &maxUtenti);
 
-    printf("Capacita' massima prestiti: ");
+    printf("Capacità massima prestiti: ");
     scanf("%d", &maxPrestiti);
 
     dbLibri = malloc(sizeof(Libro) * maxLibri);
@@ -177,16 +191,20 @@ int initDB() {
 }
 
 void mostraMenu() {
-    printf("=== MENU PRINCIPALE ===\n");
+    printf("\n=== MENU PRINCIPALE ===\n");
     printf("1. Inserisci nuovo libro\n");
     printf("2. Visualizza libri\n");
     printf("3. Cerca libro per ISBN\n");
+    printf("4. Cerca libri per Autore\n");
+    printf("4. Cerca libri disponibili\n");
     printf("6. Inserisci nuovo utente\n");
     printf("7. Visualizza utenti\n");
     printf("8. Cerca utente per codice\n");
     printf("9. Registra prestito\n");
     printf("10. Registra restituzione\n");
     printf("11. Prestiti attivi\n");
+    printf("12. Storico prestiti di un utente\n");
+    printf("13. Genera Statistiche\n");
     printf("16. Salva database (bin)\n");
     printf("17. Carica database (bin)\n");
     printf("20. Esci\n");
@@ -228,13 +246,13 @@ void inserisciLibro() {
     printf("Genere: "); scanf("%s", l.genere);
 
     dbLibri[countLibri++] = l;
-
+    dbSalvato = 0; // ci sono modifiche da salvare
 }
 
 void stampaLibro(Libro l) {
+    printf("--------------------------------\n");
     printf("ISBN: %s\nTitolo: %s\nAutore: %s\nAnno: %d\nCopie: %d\nGenere: %s\n",
            l.ISBN, l.titolo, l.autore, l.anno_pubblicazione, l.numero_copie, l.genere);
-    printf("--------------------------------\n");
 }
 
 void visualizzaLibri() {
@@ -245,15 +263,60 @@ void visualizzaLibri() {
     }
     
     for (int i = 0; i < countLibri; i++) stampaLibro(dbLibri[i]);
+    
 }
 
+void cercaLibriPerAutore() {
+    if (countLibri <= 0)
+    {
+        printf("Non sono stati inseriti libri nella libreria.\n");
+        return;
+    }
+
+    char toSearch[50];
+    printf("Inserisci il nome dell'autore: "); scanf("%[^\n]", toSearch);
+    
+    int notFound = 1;
+    for (int i = 0; i < countLibri; i++)
+    {
+        if (strcmp(dbLibri[i].autore, toSearch) == 0)
+        {
+            stampaLibro(dbLibri[i]);
+            notFound = 0;
+        }
+    }
+    if (notFound) 
+        printf("Non è stato trovato nessun libro scritto da %s\n", toSearch);
+    
+    
+
+};
+
 int cercaLibroISBN(char *ISBN) {
+    if (countLibri <= 0)
+    {
+        printf("Non sono stati inseriti libri nella libreria.\n");
+        return -1;
+    }
+
     for (int i = 0; i < countLibri; i++)
         if (strcmp(dbLibri[i].ISBN, ISBN) == 0)
             return i;
     return -1;
 }
 
+void cercaLibriDisponibili() {
+    if (countLibri <= 0)
+    {
+        printf("Non sono stati inseriti libri nella libreria.\n");
+        return;
+    }
+
+    for (int i = 0; i < countLibri; i++)
+        if (dbLibri[i].numero_copie > 0)
+            stampaLibro(dbLibri[i]);
+
+}; 
 
 // =========================================================
 // GESTIONE UTENTI
@@ -285,7 +348,8 @@ void inserisciUtente() {
         scanf("%s", u.data_iscrizione);
     }
 
-    dbUtenti[countUtenti++] = u;    
+    dbUtenti[countUtenti++] = u;
+    dbSalvato = 0; // ci sono modifiche da salvare
 }
 
 void stampaUtente(Utente u) {
@@ -295,6 +359,13 @@ void stampaUtente(Utente u) {
 }
 
 void visualizzaUtenti() {
+
+    if (countUtenti <= 0)
+    {
+        printf("Non sono stati inseriti utenti nel database.\n");
+        return;
+    }
+
     for (int i = 0; i < countUtenti; i++) stampaUtente(dbUtenti[i]);
 }
 
@@ -344,6 +415,7 @@ void creaPrestito() {
 
     dbPrestiti[countPrestiti++] = p;
     dbLibri[indiceLibro].numero_copie--;
+    dbSalvato = 0; // ci sono modifiche da salvare
 }
 
 void generaDataRestituzione(char *data, char* dataRestituzione) {
@@ -388,6 +460,7 @@ void restituisciLibro() {
             if (IL >= 0) dbLibri[IL].numero_copie++;
             
             printf("Restituito.\n");
+            dbSalvato = 0; // ci sono modifiche da salvare
             return;
         }
     }
@@ -396,14 +469,50 @@ void restituisciLibro() {
 }
 
 void visualizzaPrestitiAttivi() {
-    for (int i = 0; i < countPrestiti; i++) {
-        if (dbPrestiti[i].restituito == 0) {
-            printf("Prestito %d | ISBN %s | Utente %d\n",
-                   dbPrestiti[i].codice_prestito,
-                   dbPrestiti[i].codice_ISBN_libro,
-                   dbPrestiti[i].codice_utente);
-                }
+    if (countPrestiti <= 0)
+    {
+        printf("Non sono effettuati prestiti.\n");
+        return;
     }
+
+    for (int i = 0; i < countPrestiti; i++) {
+        if (dbPrestiti[i].restituito == 0) 
+            stampaPrestito(dbPrestiti[i]);
+    }
+}
+
+void prestitiPerUtente () {
+    if (countPrestiti <= 0)
+    {
+        printf("Non sono mai stati registrati prestiti");
+        return;
+    }
+    
+    int codice;
+    printf("Codice utente: "); scanf("%d", &codice);
+    if(cercaUtenteDaCodice(codice) == -1) {
+        printf("Nessun utente è registrato con questo codice\n");
+        return;
+    }
+    
+    int notFound = 1;
+    for (int i = 0; i < countPrestiti; i++)
+        if (dbPrestiti[i].codice_utente == codice) {
+            printf("--------------------------------\n");
+            printf("%02d) codice prestito: %d, ISBN libro: %s\n    ",
+                i+1, dbPrestiti[i].codice_prestito, dbPrestiti[i].codice_ISBN_libro);
+            if (dbPrestiti[i].restituito == 1) printf("LIBRO RESTITUITO\n");
+            else printf("LIBRO NON RESTITUITO, data restituzione: %s\n", dbPrestiti[i].data_restituzione_prevista);         
+            notFound = 0;
+        }
+    
+    if (notFound) printf("Lo storico prestiti dell'utente %d è vuoto\n", codice);
+}
+
+void stampaPrestito(Prestito l) {
+    printf("--------------------------------\n");
+    printf("codice prestito: %d\nISBN libro: %s\ncodice utente: %d\n",
+            l.codice_prestito, l.codice_ISBN_libro, l.codice_utente); 
 }
 
 // =========================================================
@@ -436,10 +545,19 @@ void salvaDB() {
     fwrite(dbPrestiti, sizeof(Prestito), countPrestiti, fp);
     fclose(fp);
     
+    dbSalvato = 1; // le modifiche sono state salvate
     printf("Database salvato.\n");
 }
 
 void caricaDB() {
+    if (!dbSalvato)
+    {
+        printf("Ci sono modifiche non salvate, caricare ora il database sovrascriverà le informazioni non salvate\nVuoi procedere lo stesso? (y/n) ");
+        char answer;
+        scanf(" %c", &answer);  // lo spazio elimina whitespace precedenti
+        if(answer != 'y') return;
+    }
+    
     char* file1 = newStrCat(path, "libri.bin");
     char* file2 = newStrCat(path, "utenti.bin");
     char* file3 = newStrCat(path, "prestiti.bin");
@@ -449,6 +567,12 @@ void caricaDB() {
     fp = fopen(file1, "rb");
     if (fp) {
         fread(&countLibri, sizeof(int), 1, fp);
+        if (countLibri > maxLibri) {
+            printf("Il numero di libri salvati (%d) è maggiore della capacità massima (%d)", countLibri, maxLibri);
+            fclose(fp);
+            return;
+        }
+        
         fread(dbLibri, sizeof(Libro), countLibri, fp);
         fclose(fp);
     }
@@ -456,6 +580,12 @@ void caricaDB() {
     fp = fopen(file2, "rb");
     if (fp) {
         fread(&countUtenti, sizeof(int), 1, fp);
+        if (countUtenti > maxUtenti) {
+            printf("Il numero di utenti salvati (%d) è maggiore della capacità massima (%d)", countUtenti, maxUtenti);
+            fclose(fp);
+            return;
+        }
+
         fread(dbUtenti, sizeof(Utente), countUtenti, fp);
         fclose(fp);
     }
@@ -463,10 +593,17 @@ void caricaDB() {
     fp = fopen(file3, "rb");
     if (fp) {
         fread(&countPrestiti, sizeof(int), 1, fp);
+        if (countPrestiti > maxPrestiti) {
+            printf("Il numero di prestiti salvati (%d) è maggiore della capacità massima (%d)", countPrestiti, maxPrestiti);
+            fclose(fp);
+            return;
+        }
+
         fread(dbPrestiti, sizeof(Prestito), countPrestiti, fp);
         fclose(fp);
     }
     
+    dbCaricato = 1;
     printf("Database caricato.\n");
 }
 
@@ -479,7 +616,7 @@ int validaData(char *data) {
     if(data[2] != '/' || data[5] != '/') return -1;
     int intData = dataToInt(data);
     int day = intData%100, month = intData/100%100, year = intData/10000;
-    printf("===\nDEBUG: intData %d, day %d, month %d, year %d\n===\n", intData, day, month, year);
+    // printf("===\nDEBUG: intData %d, day %d, month %d, year %d\n===\n", intData, day, month, year);
     if (day > 30 || day < 0 || month > 12 || month < 0 || year > 2025 || year < 1800) 
         return -1;
     return 1;
@@ -518,3 +655,37 @@ char* intToData(int data) {
 }
 
 int strToInt(char a) {return (((int) a) - 48);}
+
+void generaStatistiche() {
+    int totale_copie = 0, prestiti_attivi = 0;
+    for (int i = 0; i < countLibri; i++) totale_copie += dbLibri[i].numero_copie;
+    for (int i = 0; i < countPrestiti; i++) 
+        if (dbPrestiti[i].restituito == 0) prestiti_attivi++;
+    
+    int prestitiPerLibro[countLibri];
+    for (int i = 0; i < countLibri; i++) prestitiPerLibro[i] = 0;
+
+    // segno il numero di prestiti per ogni libro inserito
+    for (int i = 0; i < countPrestiti; i++) 
+    {
+        int idx = cercaLibroISBN(dbPrestiti[i].codice_ISBN_libro);
+        if (idx != -1) prestitiPerLibro[idx]++;
+    }
+
+    // cerco quello col valore più alto
+    int bestIDX = 0;
+    for (int i = 1; i < countLibri; i++)
+        if (prestitiPerLibro[i] > prestitiPerLibro[bestIDX]) 
+            bestIDX = i;
+
+    printf("===== STATISTICHE BIBLIOTECA =====\n");
+    printf("- Libri nel catalogo:               %d\n", countLibri);
+    printf("- Copie disponibili:                %d\n", totale_copie);
+    printf("- Utenti registrati:                %d\n", countUtenti);
+    printf("- Prestiti effettuati (storico):    %d\n", countPrestiti);
+    printf("- Prestiti attivi:                  %d\n", prestiti_attivi);
+    printf("- Libro più prestato:               %s (totale: %d)\n",
+        dbLibri[bestIDX].titolo, prestitiPerLibro[bestIDX]);
+    printf("===================================\n");
+
+}
