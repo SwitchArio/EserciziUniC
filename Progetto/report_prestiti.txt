@@ -1,0 +1,1 @@
+Codice prestito: 1 | ISBN libro: 111-1-1111-1111-1 | Titolo: La Bibbia | Codice utente: 123123 | Utente: Andrea Arielli | Data prestito: 22/11/2025 | Data restituzione prevista: 22/12/2025

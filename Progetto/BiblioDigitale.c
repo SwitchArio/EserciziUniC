@@ -2,11 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-const char path[] = "C:\\Users\\arand\\Desktop\\Progetti Coding\\Programmazione in C\\Esercizi\\Progetto\\";
+const char Path[] = "C:\\Users\\arand\\Desktop\\Progetti Coding\\Programmazione in C\\Esercizi\\Progetto\\";
 
-// =========================================================
-// STRUTTURE DATI
-// =========================================================
+// ================== STRUTTURE DATI ==================
 
 typedef struct {
     char ISBN[18];
@@ -34,9 +32,7 @@ typedef struct {
     int restituito; // 0 = no, 1 = sì
 } Prestito;
 
-// =========================================================
-// DATABASE DINAMICI
-// =========================================================
+// ================== DATABASE DINAMICI ==================
 
 Libro *dbLibri = NULL;
 Utente *dbUtenti = NULL;
@@ -46,10 +42,6 @@ int maxLibri = 0, maxUtenti = 0, maxPrestiti = 0;
 int countLibri = 0, countUtenti = 0, countPrestiti = 0;
 
 int dbCaricato = 0, dbSalvato = 1;
-
-// =========================================================
-// PROTOTIPI
-// =========================================================
 
 // Menu
 void mostraMenu();
@@ -79,9 +71,11 @@ void generaDataRestituzione(char *data, char *dataRestituzione);
 void prestitiPerUtente();
 void libriPrestati();
 
-// File Binario
+// File
 void salvaDB();
 void caricaDB();
+void esportaCatalogo();
+void esportaReportPrestiti();
 
 // Utils
 void generaStatistiche();
@@ -96,11 +90,6 @@ int strToInt(char a);
 int getIndexOfMax(int array[], int length, int searchFrom);
 void swap(int array[], int from, int to);
 
-
-// =========================================================
-// MAIN
-// =========================================================
-
 int main() {
     int scelta;
 
@@ -110,7 +99,7 @@ int main() {
     do {
         mostraMenu();
         scanf("%d", &scelta);
-        printf("\n\n\n\n\n");
+        printf("\n\n\n\n");
 
         switch (scelta) {
             case 1: inserisciLibro(); break;
@@ -126,10 +115,8 @@ int main() {
                 if (idx >= 0) stampaLibro(dbLibri[idx]);
                 else printf("Libro non trovato.\n");
             } break;
-
             case 4: cercaLibriPerAutore(); break;
             case 5: cercaLibriDisponibili(); break;
-
             case 6: inserisciUtente(); break;
             case 7: visualizzaUtenti(); break;
             case 8: {
@@ -140,7 +127,6 @@ int main() {
                 if (idx >= 0) stampaUtente(dbUtenti[idx]);
                 else printf("Utente non trovato.\n");
             } break;
-
             case 9: creaPrestito(); break;
             case 10: restituisciLibro(); break;
             case 11: visualizzaPrestitiAttivi(); break;
@@ -148,9 +134,10 @@ int main() {
             case 13: generaStatistiche(); break;
             case 14: libriPerGenere(); break;
             case 15: libriPrestati(); break;
-
             case 16: salvaDB(); break;
             case 17: caricaDB(); break;
+            case 18: esportaCatalogo(); break;
+            case 19: esportaReportPrestiti(); break;
             case 20: if (!dbSalvato) {
                 printf("Non hai salvato le tue modifiche, vuoi salvarle? (y/n) ");
                 char answer;
@@ -158,9 +145,6 @@ int main() {
                 if(answer == 'y') salvaDB();
             }
         }
-
-        
-
     } while (scelta != 20);
 
     // deallocazione
@@ -172,9 +156,7 @@ int main() {
 }
 
 
-// =========================================================
-// INIZIALIZZAZIONE DATABASE
-// =========================================================
+// ================== INIZIALIZZAZIONE DATABASE ==================
 
 int initDB() {
     printf("Capacità massima libri: ");
@@ -219,13 +201,13 @@ void mostraMenu() {
     printf("15. Top 5 libri più prestati\n");
     printf("16. Salva database (bin)\n");
     printf("17. Carica database (bin)\n");
+    printf("18. Esporta catalogo (txt)\n");
+    printf("19. Esporta report prestiti (txt)\n");
     printf("20. Esci\n");
     printf("Scelta: ");
 }
 
-// =========================================================
-// GESTIONE LIBRI
-// =========================================================
+// ================== GESTIONE LIBRI ==================
 
 void inserisciLibro() {
     if (countLibri >= maxLibri) { printf("Database libri pieno.\n"); return; }
@@ -367,9 +349,7 @@ void libriPerGenere() {
     
 }
 
-// =========================================================
-// GESTIONE UTENTI
-// =========================================================
+// ================== GESTIONE UTENTI ==================
 
 void inserisciUtente() {
     if (countUtenti >= maxUtenti) { printf("Database utenti pieno.\n"); return; }
@@ -425,10 +405,7 @@ int cercaUtenteDaCodice(int codice) {
     return -1;
 }
 
-
-// =========================================================
-// GESTIONE PRESTITI 
-// =========================================================
+// ================== GESTIONE PRESTITI ==================
 
 void creaPrestito() {
     if (countPrestiti >= maxPrestiti) { printf("Database prestiti pieno.\n"); return; }
@@ -577,9 +554,7 @@ void libriPrestati() {
     }
 }
 
-// =========================================================
-// FILE BINARI
-// =========================================================
+// ================== FILE ==================
 
 void salvaDB() {
     if (countLibri <= 0 && countLibri <= 0 && countLibri <= 0)
@@ -591,9 +566,9 @@ void salvaDB() {
     }
     
 
-    char* file1 = newStrCat(path, "libri.bin");
-    char* file2 = newStrCat(path, "utenti.bin");
-    char* file3 = newStrCat(path, "prestiti.bin");
+    char* file1 = newStrCat(Path, "libri.bin");
+    char* file2 = newStrCat(Path, "utenti.bin");
+    char* file3 = newStrCat(Path, "prestiti.bin");
 
     //LIBRI
     FILE *fp = fopen(file1, "wb");
@@ -629,11 +604,11 @@ void caricaDB() {
         if(answer != 'y') return;
     }
     
-    char* file1 = newStrCat(path, "libri.bin");
-    char* file2 = newStrCat(path, "utenti.bin");
-    char* file3 = newStrCat(path, "prestiti.bin");
+    char* file1 = newStrCat(Path, "libri.bin");
+    char* file2 = newStrCat(Path, "utenti.bin");
+    char* file3 = newStrCat(Path, "prestiti.bin");
 
-    FILE *fp;
+    FILE *fp; int failed = 0;
     // LIBRI
     fp = fopen(file1, "rb");
     if (fp) {
@@ -646,7 +621,7 @@ void caricaDB() {
         
         fread(dbLibri, sizeof(Libro), countLibri, fp);
         fclose(fp);
-    }
+    } else { printf("Impossibile caricare i libri "); failed = 1; }
     // UTENTI
     fp = fopen(file2, "rb");
     if (fp) {
@@ -659,7 +634,7 @@ void caricaDB() {
 
         fread(dbUtenti, sizeof(Utente), countUtenti, fp);
         fclose(fp);
-    }
+    } else { printf("Impossibile caricare gli utenti "); failed = 1; }
     // PRESTITI
     fp = fopen(file3, "rb");
     if (fp) {
@@ -672,15 +647,99 @@ void caricaDB() {
 
         fread(dbPrestiti, sizeof(Prestito), countPrestiti, fp);
         fclose(fp);
-    }
-    
+    } else { printf("Impossibile caricare i prestiti "); failed = 1; }
+
+    if (failed) return;
     dbCaricato = 1;
     printf("Database caricato.\n");
 }
 
-// =========================================================
-// ULITI
-// =========================================================
+void esportaCatalogo() {
+    if (countLibri <= 0) {
+        printf("Non sono stati inseriti libri nella libreria.\n");
+        return;
+    }
+
+    char *file = newStrCat(Path, "catalogo.txt");
+    FILE *fp = fopen(file, "w");
+    if (!fp) {
+        printf("Errore apertura file catalogo.\n");
+        free(file);
+        return;
+    }
+
+    for (int i = 0; i < countLibri; i++) {
+        fprintf(fp,
+            "ISBN: %s | Titolo: %s | Autore: %s | Anno: %d | Copie: %d | Genere: %s\n",
+            dbLibri[i].ISBN,
+            dbLibri[i].titolo,
+            dbLibri[i].autore,
+            dbLibri[i].anno_pubblicazione,
+            dbLibri[i].numero_copie,
+            dbLibri[i].genere
+        );
+    }
+
+    fclose(fp);
+    free(file);
+
+    printf("Catalogo esportato in catalogo.txt\n");
+}
+
+void esportaReportPrestiti() {
+    if (countPrestiti <= 0) {
+        printf("Non sono mai stati registrati prestiti.\n");
+        return;
+    }
+
+    char *file = newStrCat(Path, "report_prestiti.txt");
+    FILE *fp = fopen(file, "w");
+    if (!fp) {
+        printf("Errore apertura file report prestiti.\n");
+        free(file);
+        return;
+    }
+
+    int trovati = 0;
+
+    for (int i = 0; i < countPrestiti; i++) {
+        if (dbPrestiti[i].restituito == 0) {  // solo prestiti attivi
+            trovati = 1;
+
+            Prestito *p = &dbPrestiti[i];
+
+            int idxLibro = cercaLibroISBN(p->codice_ISBN_libro);
+            int idxUtente = cercaUtenteDaCodice(p->codice_utente);
+
+            char *titolo = "SCONOSCIUTO"; if (idxLibro  >= 0) titolo = dbLibri[idxLibro].titolo;
+            char *nome = "SCONOSCIUTO"; if (idxUtente >= 0) nome = dbUtenti[idxUtente].nome;
+            char *cognome  = ""; if (idxUtente >= 0) cognome = dbUtenti[idxUtente].cognome;
+
+            fprintf(fp,
+                "Codice prestito: %d | ISBN libro: %s | Titolo: %s | Codice utente: %d | Utente: %s %s | Data prestito: %s | Data restituzione prevista: %s\n",
+                p->codice_prestito,
+                p->codice_ISBN_libro,
+                titolo,
+                p->codice_utente,
+                nome,
+                cognome,
+                p->data_prestito,
+                p->data_restituzione_prevista
+            );
+        }
+    }
+
+    if (!trovati) {
+        fprintf(fp, "Nessun prestito attivo.\n");
+    }
+
+    fclose(fp);
+    free(file);
+
+    printf("Report prestiti esportato in report_prestiti.txt\n");
+}
+
+// ================== ULITI ==================
 
 int validaData(char *data) {
     if(strlen(data) != 10) return -1;
