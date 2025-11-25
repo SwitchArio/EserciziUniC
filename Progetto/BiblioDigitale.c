@@ -118,7 +118,7 @@ int main() {
             case 3: {
                 char isbn[20];
                 printf("Inserisci ISBN (formato XXX-X-XXXX-XXXX-X): ");
-                scanf("%s", isbn);
+                scanf(" %s", isbn);
                  
                 if(validaISBN(isbn) == -1) { printf("ISBN invalido.\n"); break; }
                 
@@ -287,7 +287,7 @@ void cercaLibriPerAutore() {
     }
 
     char toSearch[50];
-    printf("Inserisci il nome dell'autore: "); scanf("%[^\n]", toSearch);
+    printf("Inserisci il nome dell'autore: "); scanf(" %[^\n]", toSearch);
     
     int notFound = 1;
     for (int i = 0; i < countLibri; i++)
@@ -454,7 +454,7 @@ void creaPrestito() {
     p.codice_utente = codice_utente;
     printf("Data prestito: "); scanf("%s", p.data_prestito);
     while (validaData(p.data_prestito) == -1) {
-        printf("Data non valida\n Inserisci una data valida: "); 
+        printf("Data non valida\nInserisci una data valida: "); 
         scanf("%s", p.data_prestito);
     }
     char restituzione[11];
@@ -559,6 +559,9 @@ void stampaPrestito(Prestito l) {
 }
 
 void libriPrestati() {
+    if (countLibri <= 0) {printf("Non sono stati inseriti libri."); return;}
+    if (countPrestiti <= 0) {printf("Non stati prestati libri."); return;}
+
     int prestitiPerLibro[countLibri];
     getPrestitiPerLibro(prestitiPerLibro);
     
@@ -685,7 +688,7 @@ int validaData(char *data) {
     int intData = dataToInt(data);
     int day = intData%100, month = intData/100%100, year = intData/10000;
     // printf("===\nDEBUG: intData %d, day %d, month %d, year %d\n===\n", intData, day, month, year);
-    if (day > 30 || day < 0 || month > 12 || month < 0 || year > 2025 || year < 1800) 
+    if (day > 31 || day <= 0 || month > 12 || month <= 0 || year > 2025 || year < 1800) 
         return -1;
     return 1;
 };
