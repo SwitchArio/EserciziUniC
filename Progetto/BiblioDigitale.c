@@ -61,6 +61,7 @@ void visualizzaLibri();
 void cercaLibriPerAutore();
 void cercaLibriDisponibili();
 int cercaLibroISBN(char *isbn);
+void libriPerGenere();
 
 // Gestione Utenti
 void inserisciUtente();
@@ -76,6 +77,7 @@ void stampaPrestito(Prestito l);
 void prestitiPerUtente();
 void generaDataRestituzione(char *data, char *dataRestituzione);
 void prestitiPerUtente();
+void libriPrestati();
 
 // File Binario
 void salvaDB();
@@ -83,6 +85,7 @@ void caricaDB();
 
 // Utils
 void generaStatistiche();
+void getPrestitiPerLibro(int prestitiPerLibro[]);
 int initDB();
 int validaData(char *data);
 int validaEmail(char *mail);
@@ -91,6 +94,8 @@ int dataToInt(char *data);
 char* intToData(int data);
 int myPow(int a, int b);
 int strToInt(char a);
+int getIndexOfMax(int array[], int length, int searchFrom);
+void swap(int array[], int from, int to);
 
 
 // =========================================================
@@ -139,6 +144,8 @@ int main() {
             case 11: visualizzaPrestitiAttivi(); break;
             case 12: prestitiPerUtente(); break;
             case 13: generaStatistiche(); break;
+            case 14: libriPerGenere(); break;
+            case 15: libriPrestati(); break;
 
             case 16: salvaDB(); break;
             case 17: caricaDB(); break;
@@ -205,6 +212,8 @@ void mostraMenu() {
     printf("11. Prestiti attivi\n");
     printf("12. Storico prestiti di un utente\n");
     printf("13. Genera Statistiche\n");
+    printf("14. Mostra quanti libri per ogni genere\n");
+    printf("15. Top 5 libri più prestati\n");
     printf("16. Salva database (bin)\n");
     printf("17. Carica database (bin)\n");
     printf("20. Esci\n");
@@ -317,6 +326,42 @@ void cercaLibriDisponibili() {
             stampaLibro(dbLibri[i]);
 
 }; 
+
+void libriPerGenere() { // TODO prova se questa funzione worka
+    if (countLibri <= 0)
+    {
+        printf("Non sono stati inseriti libri nella libreria");
+        return;
+    }
+    
+
+    char dbGeneri[countLibri][30];
+    int inseriti = 0;
+    int libriPerGenere[countLibri];
+
+
+    for (int i = 0; i < countLibri; i++)
+    {
+        int isNew = 1; // 1 se dbLibri[i].genere non è in dbGeneri
+        for (int j = 0; j < inseriti; j++){
+            // controllo se dbLibri[i].genere è in dbGeneri
+            if (strcmp(dbGeneri[j], dbLibri[i].genere) == 0)
+            {
+                libriPerGenere[j]++; // se presente +1 copia di quel genere
+                isNew = 0;
+            }
+        }
+
+        if (isNew) { // se il genere non è presente in dbGeneri lo aggiungo
+            strcpy(dbGeneri[inseriti], dbLibri[i].genere);
+            libriPerGenere[inseriti++] = 1;
+        }
+    }
+    
+    for (int i = 0; i < inseriti; i++)
+        printf("Ci sono %d libri %s\n", libriPerGenere[i], dbGeneri[i]);
+    
+}
 
 // =========================================================
 // GESTIONE UTENTI
@@ -515,11 +560,36 @@ void stampaPrestito(Prestito l) {
             l.codice_prestito, l.codice_ISBN_libro, l.codice_utente); 
 }
 
+void libriPrestati() {
+    int prestitiPerLibro[countLibri];
+    getPrestitiPerLibro(prestitiPerLibro);
+    
+    int i = 0;
+    while(i < 5 && i < countLibri)
+    {
+        int highest = getIndexOfMax(prestitiPerLibro, countLibri, i); // indice del più alto
+        printf("%d posto, %d prestiti ", i+1, prestitiPerLibro[i]); 
+        stampaLibro(dbLibri[highest]);  // lo stampo
+        swap(prestitiPerLibro, i++, highest); 
+        // lo metto al primo posto dell'array e ripeto cercando il migliore
+        // partendo da quello in seconda posizione 
+    }
+}
+
 // =========================================================
 // FILE BINARI
 // =========================================================
 
 void salvaDB() {
+    if (countLibri <= 0 && countLibri <= 0 && countLibri <= 0)
+    {
+        printf("Non c'è nulla da salvare, così perderai i salvataggi precedenti\nVuoi procedere lo stesso? (y/n) ");
+        char answer;
+        scanf(" %c", &answer);  // lo spazio elimina whitespace precedenti
+        if(answer != 'y') return;
+    }
+    
+
     char* file1 = newStrCat(path, "libri.bin");
     char* file2 = newStrCat(path, "utenti.bin");
     char* file3 = newStrCat(path, "prestiti.bin");
@@ -663,20 +733,11 @@ void generaStatistiche() {
         if (dbPrestiti[i].restituito == 0) prestiti_attivi++;
     
     int prestitiPerLibro[countLibri];
-    for (int i = 0; i < countLibri; i++) prestitiPerLibro[i] = 0;
-
-    // segno il numero di prestiti per ogni libro inserito
-    for (int i = 0; i < countPrestiti; i++) 
-    {
-        int idx = cercaLibroISBN(dbPrestiti[i].codice_ISBN_libro);
-        if (idx != -1) prestitiPerLibro[idx]++;
-    }
+    getPrestitiPerLibro(prestitiPerLibro);
 
     // cerco quello col valore più alto
-    int bestIDX = 0;
-    for (int i = 1; i < countLibri; i++)
-        if (prestitiPerLibro[i] > prestitiPerLibro[bestIDX]) 
-            bestIDX = i;
+    int bestIDX = getIndexOfMax(prestitiPerLibro, countLibri, 0);
+
 
     printf("===== STATISTICHE BIBLIOTECA =====\n");
     printf("- Libri nel catalogo:               %d\n", countLibri);
@@ -687,5 +748,31 @@ void generaStatistiche() {
     printf("- Libro più prestato:               %s (totale: %d)\n",
         dbLibri[bestIDX].titolo, prestitiPerLibro[bestIDX]);
     printf("===================================\n");
+}
 
+void getPrestitiPerLibro(int prestitiPerLibro[])
+{
+    for (int i = 0; i < countLibri; i++) prestitiPerLibro[i] = 0;
+
+    // segno il numero di prestiti per ogni libro inserito
+    for (int i = 0; i < countPrestiti; i++)
+    {
+        int idx = cercaLibroISBN(dbPrestiti[i].codice_ISBN_libro);
+        if (idx != -1) prestitiPerLibro[idx]++;
+    }
+}
+
+int getIndexOfMax(int array[], int length, int searchFrom) {
+    int bestIDX = searchFrom;
+    for (int i = searchFrom+1; i < length; i++)
+        if (array[i] > array[bestIDX]) 
+            bestIDX = i;
+    return bestIDX;
+}
+
+void swap(int array[], int from, int to) {
+    if (to <= from) return;
+    int tmp = array[to];
+    array[to] = array[from];
+    array[from] = array[to];
 }
