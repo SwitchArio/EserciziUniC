@@ -89,6 +89,7 @@ void getPrestitiPerLibro(int prestitiPerLibro[]);
 int initDB();
 int validaData(char *data);
 int validaEmail(char *mail);
+int validaISBN(char *isbn);
 char* newStrCat(const char* str1, const char* str2);
 int dataToInt(char *data);
 char* intToData(int data);
@@ -120,6 +121,9 @@ int main() {
                 char isbn[20];
                 printf("Inserisci ISBN (formato XXX-X-XXXX-XXXX-X): ");
                 scanf("%s", isbn);
+                 
+                if(validaISBN(isbn) == -1) { printf("ISBN invalido.\n"); break; }
+                
                 int idx = cercaLibroISBN(isbn);
                 if (idx >= 0) stampaLibro(dbLibri[idx]);
                 else printf("Libro non trovato.\n");
@@ -194,6 +198,7 @@ int initDB() {
     }
 
     printf("Database inizializzato.\n\n");
+    return 0;
     //dbCaricato = 0;
 }
 
@@ -203,7 +208,7 @@ void mostraMenu() {
     printf("2. Visualizza libri\n");
     printf("3. Cerca libro per ISBN\n");
     printf("4. Cerca libri per Autore\n");
-    printf("4. Cerca libri disponibili\n");
+    printf("5. Cerca libri disponibili\n");
     printf("6. Inserisci nuovo utente\n");
     printf("7. Visualizza utenti\n");
     printf("8. Cerca utente per codice\n");
@@ -229,9 +234,10 @@ void inserisciLibro() {
 
     Libro l;
     printf("ISBN (formato XXX-X-XXXX-XXXX-X): "); scanf("%s", l.ISBN);
+    if(validaISBN(l.ISBN) == -1) { printf("ISBN invalido.\n"); return; }
 
     // unicità
-    if (cercaLibroISBN(l.ISBN) == 0) {
+    if (cercaLibroISBN(l.ISBN) >= 0) {
         printf("ISBN già presente.\n");
         return;
     }
@@ -327,7 +333,7 @@ void cercaLibriDisponibili() {
 
 }; 
 
-void libriPerGenere() { // TODO prova se questa funzione worka
+void libriPerGenere() {
     if (countLibri <= 0)
     {
         printf("Non sono stati inseriti libri nella libreria");
@@ -568,11 +574,11 @@ void libriPrestati() {
     while(i < 5 && i < countLibri)
     {
         int highest = getIndexOfMax(prestitiPerLibro, countLibri, i); // indice del più alto
-        printf("%d posto, %d prestiti ", i+1, prestitiPerLibro[i]); 
+        printf("%d posto, %d prestiti ", i+1, prestitiPerLibro[highest]); 
         stampaLibro(dbLibri[highest]);  // lo stampo
         swap(prestitiPerLibro, i++, highest); 
         // lo metto al primo posto dell'array e ripeto cercando il migliore
-        // partendo da quello in seconda posizione 
+        // partendo da quello in seconda posizione
     }
 }
 
@@ -774,5 +780,19 @@ void swap(int array[], int from, int to) {
     if (to <= from) return;
     int tmp = array[to];
     array[to] = array[from];
-    array[from] = array[to];
+    array[from] = tmp;
+}
+
+int validaISBN(char *isbn){
+    int trattini = 0;    
+    
+    if (strcmp(isbn,"r")==0) {
+        sprintf(isbn, "111-1-%04d", countLibri);
+        strcat(isbn,"-1111-1");
+    } 
+
+    for (int i = 0; i < 20; i++)
+        if (isbn[i]=='-') trattini++;
+    if (trattini != 4) return -1;
+    return 1;
 }
