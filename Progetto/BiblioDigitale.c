@@ -92,8 +92,6 @@ int validaEmail(char *mail);
 int validaISBN(char *isbn);
 char* newStrCat(const char* str1, const char* str2);
 int dataToInt(char *data);
-char* intToData(int data);
-int myPow(int a, int b);
 int strToInt(char a);
 int getIndexOfMax(int array[], int length, int searchFrom);
 void swap(int array[], int from, int to);
@@ -471,26 +469,20 @@ void creaPrestito() {
 
 void generaDataRestituzione(char *data, char* dataRestituzione) {
     int oldData = dataToInt(data);
-    // 12345678
     int day = oldData%100;
     int month = oldData/100%100;
     int year = oldData/10000;
 
     int ggXmm[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    day = (day+30)%ggXmm[month - 1];
-    month = month + (day+30)/ggXmm[month - 1];
-    year = year + (month+12)%12;
-
-    int newData = day+month*100+year*10000;
-    char* newDataStr = intToData(newData);
-    strcpy(dataRestituzione, newDataStr);
-}
-
-int myPow(int a, int b) {
-    int toReturn = 1;
-    for (int i = 0; i < b; i++) toReturn *= a;
-    return toReturn;
+    day += 30;
+    // while becca anche i casi in cui 30 giorni fanno passare 2 mesi
+    while (day > ggXmm[month - 1]) {
+        day-=ggXmm[month - 1];
+        month++;
+        if (month > 12) { month -= 12; year++; }
+    }
+    sprintf(dataRestituzione, "%02d/%02d/%04d", day, month, year);
 }
 
 void restituisciLibro() {
@@ -712,22 +704,10 @@ char* newStrCat(const char* str1, const char* str2) {
 }
 
 int dataToInt(char *data) {
-    int day = strToInt(data[1])*10+strToInt(data[0]);
+    int day = strToInt(data[0])*10+strToInt(data[1]);
     int month = strToInt(data[3])*10+strToInt(data[4]);
     int year = strToInt(data[6])*1000+strToInt(data[7])*100+strToInt(data[8])*10+strToInt(data[9]);
     return year*10000+month*100+day;
-}
-
-char* intToData(int data) { 
-    char *toReturn = malloc(11); // "gg/mm/aaaa" + '\0'
-
-    // data : aaaammgg
-    int giorno = data % 100;
-    int mese   = (data % 10000) / 100;
-    int anno   = data / 10000;
-
-    sprintf(toReturn, "%02d/%02d/%04d", giorno, mese, anno);
-    return toReturn;
 }
 
 int strToInt(char a) {return (((int) a) - 48);}
