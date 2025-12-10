@@ -66,7 +66,6 @@ void creaPrestito();
 void restituisciLibro();
 void visualizzaPrestitiAttivi();
 void stampaPrestito(Prestito l);
-void prestitiPerUtente();
 void generaDataRestituzione(char *data, char *dataRestituzione);
 void prestitiPerUtente();
 void libriPrestati();
@@ -217,29 +216,27 @@ void inserisciLibro() {
     if(validaISBN(l.ISBN) == -1) { printf("ISBN invalido.\n"); return; }
 
     // unicità
-    if (cercaLibroISBN(l.ISBN) >= 0) {
+    if (countLibri > 0 && cercaLibroISBN(l.ISBN) >= 0) {
         printf("ISBN già presente.\n");
         return;
     }
-
     
     printf("Titolo: "); scanf(" %[^\n]", l.titolo);
     printf("Autore: "); scanf(" %[^\n]", l.autore);
     
-    do
-    {
+    do {
         printf("L'anno di pubblicazione deve essere nell'intervallo 1800-2025.\n");
         printf("Anno: "); scanf("%d", &l.anno_pubblicazione);
     } while (l.anno_pubblicazione < 1800 || l.anno_pubblicazione > 2025);
 
-    do
-    {
+    do {
         printf("Il numero di copie deve essere un intero positivo.\n"); 
         printf("Copie: "); scanf("%d", &l.numero_copie);
     } while (l.numero_copie < 0);
     
     printf("Genere: "); scanf("%s", l.genere);
 
+    printf("Libro inserito correttamente.\n");
     dbLibri[countLibri++] = l;
     dbSalvato = 0; // ci sono modifiche da salvare
 }
@@ -434,9 +431,7 @@ void creaPrestito() {
         printf("Data non valida\nInserisci una data valida: "); 
         scanf("%s", p.data_prestito);
     }
-    char restituzione[11];
-    generaDataRestituzione(p.data_prestito, restituzione);
-    strcpy(p.data_restituzione_prevista, restituzione);
+    generaDataRestituzione(p.data_prestito, p.data_restituzione_prevista);
     p.restituito = 0;
 
     dbPrestiti[countPrestiti++] = p;
@@ -530,9 +525,10 @@ void prestitiPerUtente () {
 }
 
 void stampaPrestito(Prestito l) {
+    int i = cercaLibroISBN(l.codice_ISBN_libro);
     printf("--------------------------------\n");
-    printf("codice prestito: %d\nISBN libro: %s\ncodice utente: %d\n",
-            l.codice_prestito, l.codice_ISBN_libro, l.codice_utente); 
+    printf("codice prestito: %d\nTitolo libro: %s\nISBN libro: %s\ncodice utente: %d\ndata prestito: %s\ndata restituzione prevista %s\n",
+            l.codice_prestito, (i < 0) ? "sconosciuto" : dbLibri[i].titolo, l.codice_ISBN_libro, l.codice_utente, l.data_prestito, l.data_restituzione_prevista); 
 }
 
 void libriPrestati() {
@@ -746,7 +742,6 @@ int validaData(char *data) {
     if(data[2] != '/' || data[5] != '/') return -1;
     int intData = dataToInt(data);
     int day = intData%100, month = intData/100%100, year = intData/10000;
-    // printf("===\nDEBUG: intData %d, day %d, month %d, year %d\n===\n", intData, day, month, year);
     if (day > 31 || day <= 0 || month > 12 || month <= 0 || year > 2025 || year < 1800) 
         return -1;
     return 1;
@@ -775,6 +770,8 @@ int dataToInt(char *data) {
 int strToInt(char a) {return (((int) a) - 48);}
 
 void generaStatistiche() {
+    if(countLibri <= 0) {printf("Non sono stati inseriti libri."); return; }
+
     int totale_copie = 0, prestiti_attivi = 0;
     for (int i = 0; i < countLibri; i++) totale_copie += dbLibri[i].numero_copie;
     for (int i = 0; i < countPrestiti; i++) 
@@ -827,12 +824,6 @@ void swap(int array[], int from, int to) {
 
 int validaISBN(char *isbn){
     int trattini = 0;    
-    
-    if (strcmp(isbn,"r")==0) {
-        sprintf(isbn, "111-1-%04d", countLibri);
-        strcat(isbn,"-1111-1");
-    } 
-
     for (int i = 0; i < 20; i++)
         if (isbn[i]=='-') trattini++;
     if (trattini != 4) return -1;
