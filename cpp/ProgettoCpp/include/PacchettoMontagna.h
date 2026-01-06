@@ -14,8 +14,8 @@ public:
     void stampaDettagli() const override;
     string getTipologia() const override;
 
-    PacchettoMontagna(const string& codice, const string& dest, int giorni, double prezzo, // Ereditati da Pacchetto viaggio
-                      bool skipass, int numEscursioni, const string& difficolta // Particolari della classe Derivata
+    PacchettoMontagna(string codice, string dest, int giorni, double prezzo, // Ereditati da Pacchetto viaggio
+                      bool skipass, int numEscursioni, string difficolta // Particolari della classe Derivata
                     );
 };
 

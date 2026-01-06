@@ -15,8 +15,8 @@ public:
     void stampaDettagli() const override;
     string getTipologia() const override;
 
-    PacchettoAvventura(const string& codice, const string& dest, int giorni, double prezzo, // Ereditati da Pacchetto viaggio
-                      vector<string> attivita, const string& livelloAdr, bool assicurazione // Particolari della classe Derivata
+    PacchettoAvventura(string codice, string dest, int giorni, double prezzo, // Ereditati da Pacchetto viaggio
+                      vector<string> attivita, string livelloAdr, bool assicurazione // Particolari della classe Derivata
                     );
 };
 

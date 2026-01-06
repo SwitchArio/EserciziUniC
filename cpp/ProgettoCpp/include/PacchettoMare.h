@@ -14,7 +14,7 @@ public:
     void stampaDettagli() const override;
     string getTipologia() const override;
 
-    PacchettoMare(const string& codice, const string& dest, int giorni, double prezzo, // Ereditati da Pacchetto viaggio
-                   int ombrellone, const string& trattamento, bool attrezzatura // Particolari della classe Derivata
+    PacchettoMare(string codice, string dest, int giorni, double prezzo, // Ereditati da Pacchetto viaggio
+                   int ombrellone, string trattamento, bool attrezzatura // Particolari della classe Derivata
                 );
 };
