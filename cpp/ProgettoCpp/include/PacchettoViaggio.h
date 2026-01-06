@@ -13,7 +13,7 @@ protected:
     bool disponibile; // true se prenotabile, false altrimenti
 
 public:
-    PacchettoViaggio(string codice, string dest, int giorni, double prezzo);
+    PacchettoViaggio(const string& codice, const string& dest, const int giorni, const double prezzo);
     virtual ~PacchettoViaggio(); // = default  //TODO: da considerare
 
     virtual double calcolaPrezzoFinale() const = 0;
