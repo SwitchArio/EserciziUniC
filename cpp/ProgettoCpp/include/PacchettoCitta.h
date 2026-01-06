@@ -13,8 +13,7 @@ public:
     void stampaDettagli() const override;
     string getTipologia() const override;
 
-    PacchettoCitta(const string& codice, const string& dest, const int giorni, const double prezzo, // Ereditati da Pacchetto viaggio
-                   const int numMusei, const bool guida, const string& catHotel // Particolari della classe Derivata
+    PacchettoCitta(const string& codice, const string& dest, int giorni, double prezzo, // Ereditati da Pacchetto viaggio
+                   int numMusei, bool guida, const string& catHotel // Particolari della classe Derivata
                 );
-    ~PacchettoCitta() override = default;
 };
