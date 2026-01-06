@@ -8,7 +8,7 @@ class Prenotazione {
 private:
     string codicePrenotazione; // Formato: "BKG-XXXX" (generato automaticamente)
     Cliente* cliente; // Puntatore al cliente
-    PacchettoViaggio* pacchetto; // Puntatore al pacchetto (polimorfismo!) //TODO: non so se serva includere tutti i pacchetti
+    PacchettoViaggio* pacchetto; // Puntatore al pacchetto (polimorfismo!) 
     int numeroPersone; // Numero di persone per la prenotazione
     string dataPrenotazione; // Formato: "gg/mm/aaaa"
     double prezzoTotale; // Calcolato automaticamente

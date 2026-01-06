@@ -15,6 +15,6 @@ public:
     string getTipologia() const override;
 
     PacchettoMare(string codice, string dest, int giorni, double prezzo, // Ereditati da Pacchetto viaggio
-                   int ombrellone, string trattamento, bool attrezzatura // Particolari della classe Derivata
+                   bool ombrellone, string trattamento, bool attrezzatura // Particolari della classe Derivata
                 );
 };
