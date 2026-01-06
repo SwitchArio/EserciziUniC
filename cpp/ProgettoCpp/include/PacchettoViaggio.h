@@ -14,7 +14,7 @@ protected:
 
 public:
     PacchettoViaggio(string codice, string dest, int giorni, double prezzo);
-    virtual ~PacchettoViaggio(); // = default  //TODO: da considerare
+    virtual ~PacchettoViaggio() = default; //   //TODO: da considerare
 
     virtual double calcolaPrezzoFinale() const = 0;
     virtual void stampaDettagli() const = 0;
