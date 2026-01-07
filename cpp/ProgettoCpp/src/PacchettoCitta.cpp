@@ -26,7 +26,7 @@ void PacchettoCitta::stampaDettagli() const {
     cout << "Durata (giorni): " << durataGiorni << endl;
     cout << "Prezzo base: " << prezzoBase << " EUR" << endl;
 
-    cout << "Ombrellone incluso: " << (guidaTuristica ? "Si'" : "No") << endl;
+    cout << "Guida Turistica inclusa: " << (guidaTuristica ? "Si'" : "No") << endl;
     cout << "Numero Musei: " << numeroMusei << endl;
     cout << "Categoria Hotel: " << categoriaHotel << endl;
 
