@@ -29,5 +29,5 @@ public:
     void calcolaPrezzoTotale();
     void confermaPrenotazione();
     void stampaDettagli() const;
-    ~Prenotazione();
+    ~Prenotazione() = default;
 };
