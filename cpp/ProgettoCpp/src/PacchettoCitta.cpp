@@ -34,3 +34,14 @@ void PacchettoCitta::stampaDettagli() const {
 };
 
 string PacchettoCitta::getTipologia() const { return "Citta"; };
+
+string PacchettoCitta::toString() const {
+    return "Citta;" + codicePacchetto + ";" + destinazione + ";" +
+           to_string(durataGiorni) + ";" +
+           to_string(prezzoBase) + ";" +
+           (disponibile ? "1" : "0") + ";" +
+           to_string(numeroMusei) + ";" +
+           (guidaTuristica ? "1" : "0") + ";" +
+           categoriaHotel;
+}
+

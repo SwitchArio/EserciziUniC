@@ -52,3 +52,12 @@ void Prenotazione::stampaDettagli() const {
     cout << "Stato conferma: " << (confermata ? "Confermata" : "In attesa") << endl;
 
 };
+
+string Prenotazione::toString() const {
+    return codicePrenotazione + ";" + cliente->getCodiceCliente() 
+    + ";" + pacchetto->getCodicePacchetto() 
+    + ";" + to_string(numeroPersone) 
+    + ";" + dataPrenotazione 
+    + ";" + to_string(prezzoTotale) 
+    + ";" +  (confermata ? "1" : "0");
+}

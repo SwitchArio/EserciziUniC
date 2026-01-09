@@ -23,6 +23,7 @@ public:
     PacchettoViaggio* getPacchetto() const;
     double getPrezzoTotale() const;
     bool isConfermata() const;
+    string toString() const;
 
     // Calcola prezzo totale:
     // (pacchetto->calcolaPrezzoFinale() * numeroPersone) con sconto del cliente applicato

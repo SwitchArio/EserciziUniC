@@ -19,6 +19,8 @@ public:
     virtual double calcolaPrezzoFinale() const = 0;
     virtual void stampaDettagli() const = 0;
     virtual string getTipologia() const = 0;
+    virtual string toString() const = 0;
+
 
     string getCodicePacchetto() const;
     string getDestinazione() const;

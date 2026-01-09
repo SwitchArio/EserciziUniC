@@ -35,3 +35,13 @@ void PacchettoMare::stampaDettagli() const {
 }
 
 string PacchettoMare::getTipologia() const { return "Mare"; };
+
+string PacchettoMare::toString() const {
+    return "Mare;" + codicePacchetto + ";" + destinazione + ";" +
+           to_string(durataGiorni) + ";" +
+           to_string(prezzoBase) + ";" +
+           (disponibile ? "1" : "0") + ";" +
+           (ombrelloneIncluso ? "1" : "0") + ";" +
+           tipoTrattamento + ";" +
+           (attrezzaturaSportiva ? "1" : "0");
+}

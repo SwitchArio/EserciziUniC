@@ -35,3 +35,8 @@ void Cliente::stampaInfo() const {
     cout << "Eta: " << eta << endl;
     cout << "Tipologia cliente: " << tipologiaCliente << endl;
 };
+
+string Cliente::toString() const {
+    return codiceCliente + ";" + nome + ";" + cognome + ";" + 
+        email + ";" + telefono + ";" + to_string(eta) + ";" + tipologiaCliente;
+};

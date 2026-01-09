@@ -37,6 +37,7 @@ public:
     void visualizzaPrenotazioni() const;
     void visualizzaPrenotazioniCliente(string codiceCliente) const;
     void visualizzaPrenotazioniConfermate() const;
+    
     // === STATISTICHE ===
     void statisticheGenerali() const;
     // - Numero totale pacchetti

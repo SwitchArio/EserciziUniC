@@ -29,5 +29,7 @@ public:
     // Standard: 0%, Premium: 10%, VIP: 20%
     void stampaInfo() const;
 
-    ~Cliente();
+    string toString() const;
+
+    ~Cliente() = default;
 };

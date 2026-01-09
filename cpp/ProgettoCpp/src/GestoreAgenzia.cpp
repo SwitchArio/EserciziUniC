@@ -4,6 +4,7 @@
 #include "../include/PacchettoCitta.h"
 #include "../include/PacchettoAvventura.h"
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 GestoreAgenzia::GestoreAgenzia() { 
@@ -11,14 +12,15 @@ GestoreAgenzia::GestoreAgenzia() {
     prossimoCodiceCliente = 1;
     prossimoCodicePrenotazione = 1;
 }
+GestoreAgenzia::~GestoreAgenzia() {};
 
+// === GESTIONE PACCHETTI ===
 void GestoreAgenzia::aggiungiPacchettoManuale() {
     cout << "Che pacchetto vuoi inserire?\n1. Mare\n2. Citta'\n3. Montagna\n4. Avventura";
     int scelta; cin >> scelta;
     if (scelta  < 0 || scelta > 4) { cout << "scelta non valida"; return; }    
     
-    
-    string codicePacchetto = "PKG-" + string(4 - to_string(prossimoCodicePacchetto).length(), '0') + to_string(prossimoCodicePacchetto++);
+    string codicePacchetto = generaCodiceUnico('P');
     string destinazione; int durataGiorni; double prezzoBase;
     cout << "Inserisci la destinazione: "; cin >> destinazione;
     cout << "Inserisci la durata (giorni): "; cin >> durataGiorni;
@@ -28,7 +30,7 @@ void GestoreAgenzia::aggiungiPacchettoManuale() {
     {
     case 1: {       
         bool ombrelloneIncluso;
-        cout << "Inserisci se l'ombrellone è incluso (1=si,0=no) : ";
+        cout << "Inserisci se l'ombrellone e' incluso (1=si,0=no) : ";
         cin >> ombrelloneIncluso;
 
         string tipoTrattamento = "";
@@ -40,7 +42,7 @@ void GestoreAgenzia::aggiungiPacchettoManuale() {
         }
         
         bool attrezzaturaSportiva;
-        cout << "Inserisci se l'attrezzatura sportiva è inclusa (1=si,0=no) : ";
+        cout << "Inserisci se l'attrezzatura sportiva e' inclusa (1=si,0=no) : ";
         cin >> attrezzaturaSportiva;
         
         auto p = make_unique<PacchettoMare>(
@@ -65,7 +67,7 @@ void GestoreAgenzia::aggiungiPacchettoManuale() {
         }
 
         bool guidaTuristica; 
-        cout << "Inserisci se la guida turistica è inclusa (1=si,0=no) : ";
+        cout << "Inserisci se la guida turistica e' inclusa (1=si,0=no) : ";
         cin >> guidaTuristica;
 
         string categoriaHotel; 
@@ -98,7 +100,7 @@ void GestoreAgenzia::aggiungiPacchettoManuale() {
         }
 
         bool skipassIncluso; 
-        cout << "Inserisci se lo skipass è incluso (1=si,0=no) : ";
+        cout << "Inserisci se lo skipass e' incluso (1=si,0=no) : ";
         cin >> skipassIncluso;
 
         string difficolta; 
@@ -139,7 +141,7 @@ void GestoreAgenzia::aggiungiPacchettoManuale() {
         }
 
         bool assicurazioneExtra; 
-        cout << "Inserisci se l'assicurazione è inclusa (1=si,0=no) : ";
+        cout << "Inserisci se l'assicurazione e' inclusa (1=si,0=no) : ";
         cin >> assicurazioneExtra;
 
         string livelloAdrenalina; 
@@ -186,4 +188,40 @@ void GestoreAgenzia::visualizzaPacchettiPerTipologia(string tipo) const {
 void GestoreAgenzia::visualizzaPacchettiDisponibili() const {
     if (catalogo.size() <= 0) { cout << "Catalogo vuoto!" <<  endl; return; }
     for (auto& pacchetto : catalogo) if(pacchetto->isDisponibile()) pacchetto->stampaDettagli();
+};
+
+
+// === GESTIONE FILE ===
+void GestoreAgenzia::salvaDatiSuFile(const string& nomefile) const {
+    ofstream file(nomefile);
+    if (!file) { cout << "Errore nell'inizializzazione del file"; return; }
+
+    file << "===CATALOGO===\n";
+    file << "TIPO;CODICE;DESTINAZIONE;GIORNI;PREZZO;DISPONIBILE;CAMPI_SPECIFICI\n";
+    for (auto& pacchetto : catalogo) file << pacchetto->toString() << "\n";
+    
+    file << "===CLIENTI===\n";
+    file << "CODICE;NOME;COGNOME;EMAIL;TELEFONO;ETA;TIPOLOGIA\n";
+    for (auto& cliente : clienti) file << cliente->toString() << "\n";
+
+    file << "===PRENOTAZIONI===\n";
+    file << "CODICE;COD_CLIENTE;COD_PACCHETTO;NUM_PERSONE;DATA;CONFERMATA\n";
+    for (auto& prenotazione : prenotazioni) file << prenotazione->toString() << "\n";
+    file.close();
+
+};
+
+void GestoreAgenzia::caricaDatiDaFile(const string& nomefile) {
+
+};
+
+// 'P' per pacchetti, 'C' per clienti, 'B' per prenotazioni
+string GestoreAgenzia::generaCodiceUnico(char tipo) {
+    if (tipo == 'P') 
+        return "PKG-" 
+        + string(4 - to_string(prossimoCodicePacchetto).length(), '0') 
+        + to_string(prossimoCodicePacchetto++);
+    if (tipo == 'C') 
+        return "";
+    return "";
 };

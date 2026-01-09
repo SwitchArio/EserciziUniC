@@ -34,3 +34,13 @@ void PacchettoMontagna::stampaDettagli() const {
 };
 
 string PacchettoMontagna::getTipologia() const { return "Montagna"; };
+
+string PacchettoMontagna::toString() const {
+    return "Montagna;" + codicePacchetto + ";" + destinazione + ";" +
+           to_string(durataGiorni) + ";" +
+           to_string(prezzoBase) + ";" +
+           (disponibile ? "1" : "0") + ";" +
+           (skipassIncluso ? "1" : "0") + ";" +
+           to_string(numeroEscursioni) + ";" +
+           difficolta;
+}

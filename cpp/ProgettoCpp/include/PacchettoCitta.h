@@ -12,6 +12,7 @@ public:
     double calcolaPrezzoFinale() const override;
     void stampaDettagli() const override;
     string getTipologia() const override;
+    string toString() const override;
 
     PacchettoCitta(string codice, string dest, int giorni, double prezzo, // Ereditati da Pacchetto viaggio
                    int numMusei, bool guida, string catHotel // Particolari della classe Derivata

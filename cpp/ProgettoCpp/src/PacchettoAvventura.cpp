@@ -37,3 +37,19 @@ void PacchettoAvventura::stampaDettagli() const {
 };
 
 string PacchettoAvventura::getTipologia() const { return "Avventura"; };
+
+string PacchettoAvventura::toString() const {
+    string attivitaStr = "";
+    for (int i = 0; i < attivita.size(); ++i) {
+        attivitaStr += attivita[i];
+        if (i < attivita.size() - 1) attivitaStr += "|";
+    }
+
+    return "Avventura;" + codicePacchetto + ";" + destinazione + ";" +
+           to_string(durataGiorni) + ";" +
+           to_string(prezzoBase) + ";" +
+           (disponibile ? "1" : "0") + ";" +
+           attivitaStr + ";" +
+           livelloAdrenalina + ";" + 
+           (assicurazioneExtra ? "1" : "0");
+}

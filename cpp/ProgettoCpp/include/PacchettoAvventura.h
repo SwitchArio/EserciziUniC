@@ -14,6 +14,7 @@ public:
     double calcolaPrezzoFinale() const override;
     void stampaDettagli() const override;
     string getTipologia() const override;
+    string toString() const override;
 
     PacchettoAvventura(string codice, string dest, int giorni, double prezzo, // Ereditati da Pacchetto viaggio
                       vector<string> attivita, string livelloAdr, bool assicurazione // Particolari della classe Derivata
