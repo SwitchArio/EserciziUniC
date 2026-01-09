@@ -1,14 +1,14 @@
 #pragma once
 
-#include <vector>
+#include "Utils.h"
 #include "Prenotazione.h" // Contiene Cliente, Pacchetto e String
 using namespace std;
 
 class GestoreAgenzia {
-private:
-    vector<PacchettoViaggio*> catalogo; // Tutti i pacchetti disponibili (Polimorfismo)
-    vector<Cliente*> clienti; // Tutti i clienti registrati
-    vector<Prenotazione*> prenotazioni; // Tutte le prenotazioni
+private: 
+    vector<unique_ptr<PacchettoViaggio>> catalogo; // Tutti i pacchetti disponibili (Polimorfismo)
+    vector<unique_ptr<Cliente>> clienti; // Tutti i clienti registrati
+    vector<unique_ptr<Prenotazione>> prenotazioni; // Tutte le prenotazioni
     int prossimoCodicePacchetto; // Per generare codici univoci
     int prossimoCodiceCliente; // Per generare codici univoci
     int prossimoCodicePrenotazione; // Per generare codici univoci
@@ -20,14 +20,14 @@ public:
 
     // === GESTIONE PACCHETTI ===
     void aggiungiPacchettoManuale(); // Chiede dati da tastiera
-    PacchettoViaggio* cercaPacchetto(string codice);
+    unique_ptr<PacchettoViaggio> cercaPacchetto(string codice);
     void visualizzaCatalogo() const;
     void visualizzaPacchettiPerTipologia(string tipo) const;
     void visualizzaPacchettiDisponibili() const;
     
     // === GESTIONE CLIENTI ===
     void aggiungiCliente();
-    Cliente* cercaCliente(string codice);
+    unique_ptr<Cliente> cercaCliente(string codice);
     void visualizzaClienti() const;
     void visualizzaClientiPerTipologia(string tipo) const;
 
@@ -49,7 +49,7 @@ public:
     void statistichePerTipologia() const;
     // Conteggio prenotazioni per ogni tipo di pacchetto
 
-    Cliente* clienteMigliore() const;
+    unique_ptr<Cliente> clienteMigliore() const;
     // Cliente con maggior spesa totale
 
     // === GESTIONE FILE ===
